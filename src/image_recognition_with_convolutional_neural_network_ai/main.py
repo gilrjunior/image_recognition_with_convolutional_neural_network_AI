@@ -1,5 +1,10 @@
+from data_processing import *
+
 def main():
-    print("Hello, World!")
+    
+   image = load_image("Pogba")
+   print(image.shape)
+
     
 if __name__ == "__main__":
     main()
