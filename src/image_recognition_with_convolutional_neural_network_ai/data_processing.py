@@ -1,23 +1,24 @@
-import os
-import numpy as np
-from PIL import Image
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-# Obtém o diretório do arquivo atual
-current_dir = os.path.dirname(os.path.abspath(__file__))
+def get_data_generators(dataset_path, image_size=(128, 128), batch_size=32):
+    datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
 
-targets_filename = "targets.csv"
+    train_generator = datagen.flow_from_directory(
+        dataset_path,
+        target_size=image_size,
+        batch_size=batch_size,
+        class_mode='categorical',
+        subset='training',
+        shuffle=True
+    )
 
-# Constrói o caminho absoluto para o arquivo de dados
-training_file_path = os.path.join(current_dir, f"../../dataset/")
-targets_file_path = os.path.join(current_dir, f"../../data/{targets_filename}")
+    val_generator = datagen.flow_from_directory(
+        dataset_path,
+        target_size=image_size,
+        batch_size=batch_size,
+        class_mode='categorical',
+        subset='validation',
+        shuffle=True
+    )
 
-# Tamanho para redimensionar as imagens (se necessário)
-img_height = 64
-img_width = 64
-
-def load_image(player_name):
-    """Carrega uma imagem PNG, redimensiona e converte em matriz NumPy normalizada"""
-    img = Image.open(f"{training_file_path}/{player_name}/{player_name}001.png").convert('L')  # ou "L" para grayscale
-    img = img.resize((img_width, img_height))        # redimensionar se necessário
-    img_array = np.array(img) / 255.0                # normaliza os pixels para [0, 1]
-    return img_array
+    return train_generator, val_generator
